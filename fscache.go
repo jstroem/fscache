@@ -216,6 +216,17 @@ func (c *FSCache) Clean() error {
 	return c.fs.RemoveAll()
 }
 
+func (c *FSCache) Stat(key string) (os.FileInfo, error) {
+	key = c.mapKey(key)
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	f, ok := c.files[key]
+	if !ok {
+		return nil, os.ErrNotExist
+	}
+	return c.fs.Stat(f.Name())
+}
+
 type accessor struct {
 	c *FSCache
 }
